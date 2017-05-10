@@ -1,0 +1,26 @@
+{
+  "name": "pikagames.papercast",
+  "authors": [
+    "Dan Spiteri <trudan97@gmail.com>"
+  ],
+  "description": "",
+  "main": "",
+  "license": "MIT",
+  "homepage": "",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular-material": "^1.1.4",
+    "angular-cookies": "^1.6.4",
+    "angular-ui-router": "0.4",
+    "ui-router-extras": "^0.1.3",
+    "angular": "^1.6.4",
+    "jquery": "^3.2.1"
+  }
+}

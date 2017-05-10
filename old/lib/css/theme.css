@@ -1,0 +1,90 @@
+body {
+  background-color: '{{background-900}}'; }
+
+profile.md-THEME_NAME-theme > profile-image {
+  background-color: '{{background-800}}';
+  border-color: '{{primary-700}}'; }
+
+profile.md-THEME_NAME-theme .md-chips md-chip {
+  background-color: '{{primary-600}}';
+  color: '{{background-200}}'; }
+
+profile-image.md-THEME_NAME-theme, .md-fab-profile.md-THEME_NAME-theme {
+  background-color: '{{background-800}}';
+  border-color: '{{primary-700}}'; }
+
+md-list-item.md-warn .md-button, md-list-item.md-warn md-icon {
+  color: '{{warn-color}}'; }
+
+md-toast.md-warn .md-toast-content {
+  color: '{{warn-color}}'; }
+  md-toast.md-warn .md-toast-content .md-subhead {
+    color: '{{warn-hue-1}}'; }
+
+md-menu-content.md-THEME_NAME-theme.md-menu-bar-menu {
+  background-color: '{{background-hue-1}}'; }
+  md-menu-content.md-THEME_NAME-theme.md-menu-bar-menu md-menu-item.md-in-menu-bar {
+    color: '{{foreground-2}}'; }
+    md-menu-content.md-THEME_NAME-theme.md-menu-bar-menu md-menu-item.md-in-menu-bar md-icon {
+      color: '{{foreground-3}}'; }
+    md-menu-content.md-THEME_NAME-theme.md-menu-bar-menu md-menu-item.md-in-menu-bar .md-button[disabled] {
+      color: '{{foreground-2}}'; }
+      md-menu-content.md-THEME_NAME-theme.md-menu-bar-menu md-menu-item.md-in-menu-bar .md-button[disabled] md-icon {
+        color: '{{foreground-3}}'; }
+  md-menu-content.md-THEME_NAME-theme.md-menu-bar-menu md-menu-divider {
+    background-color: '{{foreground-4}}'; }
+
+md-toolbar.md-THEME_NAME-theme.debug-bar.md-menu-toolbar {
+  background-color: '{{background-hue-1}}';
+  color: '{{foreground-1}}'; }
+  md-toolbar.md-THEME_NAME-theme.debug-bar.md-menu-toolbar md-toolbar-filler {
+    background-color: '{{accent-color}}';
+    color: '{{background-A100-0.87}}'; }
+    md-toolbar.md-THEME_NAME-theme.debug-bar.md-menu-toolbar md-toolbar-filler md-icon {
+      color: '{{background-A100-0.87}}'; }
+
+md-menu-bar.md-THEME_NAME-theme > button.md-button, md-menu-bar.md-THEME_NAME-theme md-menu > button, debug-bar md-menu-bar.md-THEME_NAME-theme > button.md-button, debug-bar md-menu-bar.md-THEME_NAME-theme md-menu > button {
+  color: '{{foreground-1}}'; }
+
+md-menu-bar.md-THEME_NAME-theme md-menu.md-open > button, md-menu-bar.md-THEME_NAME-theme md-menu > button:focus, debug-bar md-menu-bar.md-THEME_NAME-theme md-menu.md-open > button, debug-bar md-menu-bar.md-THEME_NAME-theme md-menu > button:focus {
+  outline: none;
+  background-color: '{{background-hue-3-0.2}}'; }
+
+md-menu-bar.md-THEME_NAME-theme.md-open:not(.md-keyboard-mode) md-menu:hover > button, debug-bar md-menu-bar.md-THEME_NAME-theme.md-open:not(.md-keyboard-mode) md-menu:hover > button {
+  background-color: '{{background-hue-3-0.2}}'; }
+
+.cast-state-button.md-THEME_NAME-theme > span.cast-icon > svg {
+  fill: '{{foreground-1-0.5}}'; }
+
+.cast-state-button.md-THEME_NAME-theme.cast-state-not-connected > span.cast-icon {
+  opacity: 0.75; }
+
+.cast-state-button.md-THEME_NAME-theme.cast-state-connecting > span.cast-icon > svg {
+  fill: '{{primary-hue-1-0.75}}'; }
+
+.cast-state-button.md-THEME_NAME-theme.cast-state-connected > span.cast-icon > svg, .cast-state-button.md-THEME_NAME-theme.cast-state-connected > span.cast-icon > svg #boxfill {
+  fill: '{{primary-color}}'; }
+
+.cast-state-button.md-THEME_NAME-theme[disabled] > span.cast-icon {
+  opacity: 0.5 !important; }
+
+.cast-state-button.md-THEME_NAME-theme.md-raised > span.cast-icon > svg {
+  fill: '{{background-900}}'; }
+
+range-slider.md-THEME_NAME-theme .range-slider-left md-slider .md-track {
+  background-color: '{{accent-color}}'; }
+  range-slider.md-THEME_NAME-theme .range-slider-left md-slider .md-track.md-track-fill {
+    background-color: '{{background-hue-1}}'; }
+
+range-slider.md-THEME_NAME-theme .range-slider-left md-slider .md-thumb:after {
+  border-color: '{{accent-color}}';
+  background-color: '{{accent-color}}'; }
+
+range-slider.md-THEME_NAME-theme .range-slider-right md-slider .md-track-container .md-track {
+  background-color: '{{background-hue-1}}'; }
+  range-slider.md-THEME_NAME-theme .range-slider-right md-slider .md-track-container .md-track.md-track-fill {
+    background-color: '{{accent-color}}'; }
+
+range-slider.md-THEME_NAME-theme .range-slider-right md-slider .md-thumb:after {
+  border-color: '{{accent-color}}';
+  background-color: '{{accent-color}}'; }

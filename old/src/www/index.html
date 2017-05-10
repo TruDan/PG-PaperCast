@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+    <title>PaperCast</title>
+
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Roboto:300,400,500,700">
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/icon?family=Material+Icons">
+
+    <!-- bower:css -->
+    <!-- endinject -->
+
+    <!-- inject:css -->
+    <!-- endinject -->
+</head>
+<body md-theme="{{$theme}}" md-theme-watch ng-app="PaperCast" ng-controller="PaperCastRootController" ng-cloak>
+    <div id="app" layout-fill layout="column" layout-align="start stretch">
+
+        <client-debug-bar></client-debug-bar>
+
+        <section flex layout="column" layout-align="space-between stretch" ui-view>
+
+        </section>
+
+    </div>
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/pixi.js/4.5.1/pixi.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/EventEmitter/5.1.0/EventEmitter.min.js"></script>
+
+    <!-- bower:js -->
+    <!-- endinject -->
+
+    <!-- inject:js -->
+    <!-- endinject -->
+
+    <script type="text/javascript" src="//www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
+</body>
+</html>

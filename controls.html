@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PaperCast Client</title>
+    <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.blue_grey-green.min.css" />
+    <link rel="stylesheet" type="text/css" href="/res/css/controls.css" />
+</head>
+<body class="mdl-base">
+
+    <div class="mdl-layout mdl-js-layout">
+
+        <main class="mdl-layout__content overlay">
+            <section class="section--center mdl-grid" id="overlay">
+                <div class="mdl-cell mdl-cell--4-col"></div>
+
+                <div class="mdl-cell mdl-cell--4-col mdl-cell--middle mdl-typography--text-center mdl-card mdl-shadow--2dp">
+                    <form action="#" id="enter-name">
+                            <div class="mdl-card__title">
+                                <h2 class="mdl-card__title-text">PaperCast</h2>
+                            </div>
+                            <div class="mdl-card__supporting-text">
+                                <div class="mdl-textfield mdl-js-textfield">
+                                    <input class="mdl-textfield__input" type="text" id="name">
+                                    <label class="mdl-textfield__label" for="name">Username</label>
+                                </div>
+                                <div class="mdl-textfield mdl-js-textfield">
+                                    <input class="mdl-textfield__input" type="text" id="gameid">
+                                    <label class="mdl-textfield__label" for="gameid">Game Code</label>
+                                </div>
+                            </div>
+                            <div class="mdl-card__actions mdl-card--border">
+                                <input class="mdl-button mdl-button--raised mdl-button--colored mdl-js-button mdl-js-ripple-effect" type="submit" value="Play" />
+                            </div>
+                    </form>
+                </div>
+                <div class="mdl-cell mdl-cell--4-col"></div>
+            </section>
+            <section class="section--center mdl-grid" id="game-over">
+                <div class="mdl-cell mdl-cell--4-col"></div>
+                <div class="mdl-cell mdl-cell--4-col mdl-cell--middle mdl-typography--text-center mdl-card mdl-shadow--2dp">
+                        <div class="mdl-card__title">
+                            <h2 class="mdl-card__title-text">Game Over!</h2>
+                        </div>
+                        <div class="mdl-card__actions mdl-card--border">
+                            <button class="mdl-button mdl-button--raised mdl-button--colored mdl-js-button mdl-js-ripple-effect">Play Again?</button>
+                        </div>
+                </div>
+                <div class="mdl-cell mdl-cell--4-col"></div>
+            </section>
+        </main>
+        <div id="controls">
+            <div class="move pad">
+                <div class="area">
+                    <div class="angle-indicator"></div>
+                </div>
+            </div>
+            <div class="center">
+                <div class="fullscreen-toggle"></div>
+                <div class="connection-indicator red"></div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="../node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="../node_modules/material-design-lite/material.min.js"></script>
+    <script type="text/javascript" src="../node_modules/deepstream.io-client-js/dist/deepstream.min.js"></script>
+    <script type="text/javascript" src="/build/controls.bundle.js"></script>
+</body>
+</html>
