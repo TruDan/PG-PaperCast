@@ -2,6 +2,7 @@
  * Created by truda on 10/05/2017.
  */
 
+var PIXI = require("pixi.js");
 module.exports = class Trail {
 
     constructor(player) {
@@ -28,12 +29,12 @@ module.exports = class Trail {
     }
 
     addPoint(x, y) {
-        let p = this._player.level.getCellPoint(x,y);
+        let p = this._player.level.getCellPosFromPoint(x,y);
 
         if(!p.equals(this._lastPoint)) {
             this._lastPoint = p;
 
-            if(this.points.length > 0 || this._player.level.getCellAt(p.x, p.y).owner !== this._player) {
+            if(this.points.length > 0 || this._player.level.getCell(p.x, p.y).owner !== this._player) {
                 this.points.add(p);
             }
         }
@@ -42,7 +43,7 @@ module.exports = class Trail {
     };
 
     containsPoint(x, y) {
-        let p = this._player.level.getCellPoint(x,y);
+        let p = this._player.level.getCellPosFromPoint(x,y);
 
         let points = [...this.points];
         for(var i=0;i < points.length - 1;i++) { // -1 to ignore last
@@ -77,10 +78,10 @@ module.exports = class Trail {
 
             let shrink2 = (2*shrink);
 
-            let x1 = (c.x*size)+shrink;
-            let y1 = (c.y*size)+shrink;
-            let x2 = ((c.x+1)*size)-shrink;
-            let y2 = ((c.y+1)*size)-shrink;
+            let x1 = this._player.level.gridOffset.x + (c.x*size)+shrink;
+            let y1 = this._player.level.gridOffset.y + (c.y*size)+shrink;
+            let x2 = this._player.level.gridOffset.x + ((c.x+1)*size)-shrink;
+            let y2 = this._player.level.gridOffset.y + ((c.y+1)*size)-shrink;
 
             let last = false;
             if(i+1 === points.length) {

@@ -63,7 +63,7 @@ module.exports = class Main extends State {
         this.titleText.filters = [this.filter];
 
         // Resume application update
-        this.stage.addChild(this.titleText);
+        this._viewInternal.addChild(this.titleText);
 
 
 
@@ -84,7 +84,7 @@ module.exports = class Main extends State {
         this.roomCodeText.anchor.set(0.5);
         this.roomCodeText.x = this.game.renderer.width / 2;
         this.roomCodeText.y = (this.game.renderer.height / 3) * 2;
-        this.stage.addChild(this.roomCodeText);
+        this._viewInternal.addChild(this.roomCodeText);
 
 
     }

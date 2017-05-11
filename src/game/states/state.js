@@ -8,7 +8,7 @@ module.exports = class State {
     constructor(game) {
         this.game = game;
         this.isActive = false;
-        this.stage = new PIXI.Container();
+        this._viewInternal = new PIXI.Container();
     }
 
     onInit() {}

@@ -15,7 +15,7 @@ angular.module("PaperCast")
 
                 this.players = [];
 
-                this.stage = new PIXI.Container();
+                this._viewInternal = new PIXI.Container();
 
                 this.renderer = PIXI.autoDetectRenderer( window.innerWidth, window.innerHeight, {transparent: true}, false );
                 this._element.append( this.renderer.view );
@@ -46,7 +46,7 @@ angular.module("PaperCast")
                 // store the time
                 this._lastFrameTime = currentTime;
 
-                this.renderer.render( this.stage );
+                this.renderer.render( this._viewInternal );
 
                 requestAnimationFrame( this._tick.bind( this ) );
             }
@@ -76,7 +76,7 @@ angular.module("PaperCast")
                 this._text = new PIXI.Text( name, this._textStyle );
                 this._text.anchor.x = 0.5;
                 this._text.anchor.y = 0.5;
-                this._game.stage.addChild( this._text )
+                this._game._viewInternal.addChild( this._text )
 
                 this._stage = new PIXI.Container();
                 this._stage.position.x = x;
@@ -94,13 +94,13 @@ angular.module("PaperCast")
                 this._body.anchor.y = 0.5;
                 this._stage.addChild(this._body);
 
-                this._game.stage.addChild(this._stage);
+                this._game._viewInternal.addChild(this._stage);
                 this._game.on( 'update', this._update.bind( this ) );
             }
 
             remove() {
-                this._game.stage.removeChild( this._stage );
-                this._game.stage.removeChild( this._text );
+                this._game._viewInternal.removeChild( this._stage );
+                this._game._viewInternal.removeChild( this._text );
             }
 
             _getTint() {

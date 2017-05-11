@@ -20,9 +20,11 @@ module.exports = class Debug {
         this.game = new Game(window.document.body);
         window.document.body.aGame = this.game;
 
-        //this.player1 = this.game.addPlayer("dffgsdfgsdf");
-        //this.player1.name = "Player1";
+        this.player1 = this.game.addPlayer("dffgsdfgsdf");
+        this.player1.name = "Player1";
         //this.player2 = this.game.addPlayer("2");
+
+        this.viewport = this.game.level.viewport;
 
         console.log(this);
 
@@ -53,6 +55,26 @@ module.exports = class Debug {
                 case PIXI.keyboard.Key.RIGHT:
                     _this.player2.move(Direction.RIGHT);
                     break;
+
+                case PIXI.keyboard.Key.NUM_2:
+                    _this.viewport.moveCamera(0, -10);
+                    break;
+                case PIXI.keyboard.Key.NUM_8:
+                    _this.viewport.moveCamera(0, 10);
+                    break;
+                case PIXI.keyboard.Key.NUM_6:
+                    _this.viewport.moveCamera(-10, 0);
+                    break;
+                case PIXI.keyboard.Key.NUM_4:
+                    _this.viewport.moveCamera(10, 0);
+                    break;
+                case PIXI.keyboard.Key.NUM_9:
+                    _this.viewport.zoomCamera(0.05);
+                    break;
+                case PIXI.keyboard.Key.NUM_3:
+                    _this.viewport.zoomCamera(-0.05);
+                    break;
+
             }
         });
     }

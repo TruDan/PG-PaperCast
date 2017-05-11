@@ -62,15 +62,6 @@ module.exports = class Player {
     }
 
     respawn(level, x, y) {
-        if(this.level !== level) {
-            if(this.level !== null) {
-                this.level._stagePlayers.removeChild(this._trail._gfx);
-                this.level._stagePlayers.removeChild(this._stage);
-            }
-
-            level._stagePlayers.addChild(this._trail._gfx);
-            level._stagePlayers.addChild(this._stage);
-        }
         this.level = level;
 
         this.x = x;
@@ -80,7 +71,7 @@ module.exports = class Player {
         this.reset();
 
         // Claim a 3x3
-        var cellPos = this.getCellPosition();
+        var cellPos = this.getCurrentCell();
         for(var i=-1;i<=1;i++) {
             for(var j=-1;j<=1;j++) {
                 this._claimCell(cellPos.x + i, cellPos.y + j);
@@ -103,13 +94,13 @@ module.exports = class Player {
 
     reset() {
         this.isAlive = false;
-        this._stage.alpha = 1;
+        this.view.alpha = 1;
         this._trail.reset();
     }
 
     kill() {
         this.isAlive = false;
-        this._stage.alpha = 0;
+        this.view.alpha = 0;
 
         this._isMoving = false;
         this._direction = Direction.NONE;
@@ -122,14 +113,13 @@ module.exports = class Player {
     }
 
     remove() {
-        this.level._stagePlayers.removeChild(this._trail._gfx);
-        this.level._stagePlayers.removeChild(this._stage);
-        this._record.delete();
+        if(this._record !== undefined)
+            this._record.delete();
         this._game._removeDebugInfo(this._debugPos);
     }
 
-    getCellPosition() {
-        return this.level.getCellPoint(this.x, this.y);
+    getCurrentCell() {
+        return this.level.getCellPosFromPoint(this.x, this.y);
     }
 
     isCollidingWith(player) {
@@ -148,7 +138,7 @@ module.exports = class Player {
 
         // Only change their direction when fully in a grid cell
         let cellSize = this.level.cellSize;
-        if(this.x % cellSize === 0 && this.y % cellSize === 0) {
+        if((this.x - this.level.gridOffset.x) % cellSize === 0 && (this.y - this.level.gridOffset.y) % cellSize === 0) {
             this._direction = this._nextDirection;
         }
 
@@ -160,55 +150,56 @@ module.exports = class Player {
         let targetY = this.y + (movePoint.y * SPEED);
 
         // normalise to cell pos
-        var cellPos = this.getCellPosition();
+        var cellPos = this.getCurrentCell();
 
-        if(this.y % this.level.cellSize !== 0) {
+        if((this.y - this.level.gridOffset.y) % cellSize !== 0) {
             if (this._direction === Direction.UP) {
-                targetY = Math.max(targetY, (cellPos.y) * this.level.cellSize);
+                targetY = Math.max(targetY, this.level.gridOffset.y + (cellPos.y) * this.level.cellSize);
             }
             else if (this._direction === Direction.DOWN) {
-                targetY = Math.min(targetY, (cellPos.y + 1) * this.level.cellSize);
+                targetY = Math.min(targetY, this.level.gridOffset.y + (cellPos.y + 1) * this.level.cellSize);
             }
         }
 
-        if(this.x % this.level.cellSize !== 0) {
+        if((this.x - this.level.gridOffset.x) % cellSize !== 0) {
             if (this._direction === Direction.LEFT) {
-                targetX = Math.max(targetX, (cellPos.x) * this.level.cellSize);
+                targetX = Math.max(targetX, this.level.gridOffset.x + (cellPos.x) * this.level.cellSize);
             }
             else if (this._direction === Direction.DOWN) {
-                targetX = Math.min(targetX, (cellPos.x + 1) * this.level.cellSize);
+                targetX = Math.min(targetX, this.level.gridOffset.x + (cellPos.x + 1) * this.level.cellSize);
             }
         }
 
         if(this._canMove(targetX, targetY)) {
-            if(this.x % this.level.cellSize === 0 && this.y % this.level.cellSize === 0) {
+            if((this.x - this.level.gridOffset.x) % cellSize === 0 && (this.y - this.level.gridOffset.y) % cellSize === 0) {
                 this._checkClaimedCells();
             }
 
             this.x = Math.floor(targetX);
             this.y = Math.floor(targetY);
-            //this._game.stage.target.x = this.x;
-            //this._game.stage.target.y = this.y;
+            //this._game._viewInternal.target.x = this.x;
+            //this._game._viewInternal.target.y = this.y;
             this._trail.addPoint(this.x, this.y);
         }
         else {
             // snap to nearest grid tile
-            this.x = Math.round(this.x / cellSize) * cellSize;
-            this.y = Math.round(this.y / cellSize) * cellSize;
+            var cp = this.level.getCellPointFromPoint(this.x, this.y);
+            this.x = cp.x;
+            this.y = cp.y;
             this._direction = Direction.NONE;
         }
     }
 
     _claimCell(x,y) {
         //console.log("Player " + this.name + " is claiming " + x + "," + y);
-        var cell = this.level.getCellAt(x,y);
+        var cell = this.level.getCell(x,y);
         cell.claim(this);
         cell._paint(this.level.tiles);
     }
 
     _checkClaimedCells() {
-        var cellPos = this.getCellPosition();
-        var cell = this.level.getCellAt(cellPos.x, cellPos.y);
+        var cellPos = this.getCurrentCell();
+        var cell = this.level.getCell(cellPos.x, cellPos.y);
         if(cell.owner === this) {
             // Claim all cells in this path and reset path.
             var points = [...this._trail.points];
@@ -277,10 +268,10 @@ module.exports = class Player {
     }
 
     _updateDebug() {
-        var cellPoint = this.getCellPosition();
+        var cellPoint = this.getCurrentCell();
 
         this._debugPos.style.fill = this.isAlive ? "rgb(255,255,255)" : "rgb(255,32,32)";
-        this._debugPos.text = "Player(" + this.name + ")\tPosition: (x: " + this.x + ", y: " + this.y + ") \tCell: (x: " + cellPoint.x + ", y: "+ cellPoint.y + ") [" + (this.x % this.level.cellSize) + "," + (this.y % this.level.cellSize) + "]" + (!this.isAlive ? "!!DEAD!!" : "");
+        this._debugPos.text = "Player(" + this.name + ")\tPosition: (x: " + this.x + ", y: " + this.y + ") \tCell: (x: " + cellPoint.x + ", y: "+ cellPoint.y + ") [" + ((this.x - this.level.gridOffset.x) % this.level.cellSize) + "," + ((this.y - this.level.gridOffset.y) % this.level.cellSize) + "]" + (!this.isAlive ? "!!DEAD!!" : "");
     }
 
     _update( msSinceLastFrame, currentTime ) {
@@ -313,20 +304,26 @@ module.exports = class Player {
 
     _updateGraphics() {
         // update gfx position
-        this._stage.position.x = this.x;
-        this._stage.position.y = this.y;
+        this.view.position.x = this.x;
+        this.view.position.y = this.y;
         this._text.text = this.name === "" ? "---" : this.name;
     }
 
     _initGraphics() {
-        this._stage = new PIXI.Container();
+        this.view = new PIXI.Container();
+        this._viewParts = {
+            body: new PIXI.Container(),
+           // trail: this._trail.view
+        };
+        this.view.addChild(this._viewParts.body);
+
         //this._stage.alpha = 0.5;
-        this._stage.position.x = 0;
-        this._stage.position.y = 0;
-        this._stage.pivot.x = 0;
-        this._stage.pivot.y = 0;
-        this._stage.height = this.height + 30;
-        this._stage.width = this.width;
+        this._viewParts.body.position.x = 0;
+        this._viewParts.body.position.y = 0;
+        this._viewParts.body.pivot.x = 0;
+        this._viewParts.body.pivot.y = 0;
+        this._viewParts.body.height = this.height + 30;
+        this._viewParts.body.width = this.width;
 
         var texture = PIXI.Texture.fromImage('/res/img/player.png');
 
@@ -336,7 +333,7 @@ module.exports = class Player {
         this._body.width = this.width;
         this._body.anchor.x = 0;
         this._body.anchor.y = 0;
-        this._stage.addChild(this._body);
+        this._viewParts.body.addChild(this._body);
 
 
         this._text = new PIXI.Text( this.name, {
@@ -363,7 +360,7 @@ module.exports = class Player {
         this._text.anchor.x = 0.5;
         this._text.anchor.y = 1;
         //this._text.alpha = 50;
-        this._stage.addChild( this._text );
+        this._viewParts.body.addChild( this._text );
     }
 
 };

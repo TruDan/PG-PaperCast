@@ -7,7 +7,7 @@ const PIXI = require( 'pixi.js' );
 module.exports = class Background {
     constructor(game) {
         this.game = game;
-        this.stage = new PIXI.Container();
+        this._viewInternal = new PIXI.Container();
 
         // Constants
         this.numStars = 1000;
@@ -17,7 +17,7 @@ module.exports = class Background {
         for(var i=0; i<this.numStars; i++) {
             var s = this._createStar();
             this.stars.push(s);
-            this.stage.addChild(s);
+            this._viewInternal.addChild(s);
         }
     }
 

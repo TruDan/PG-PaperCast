@@ -49,13 +49,12 @@ module.exports = class Game extends EventEmitter{
         };
 
         this.background = new Background(this);
-        //this.background.stage.width = this.renderer.width;
-       //this.background.stage.height = this.renderer.height;
-        this.layers.bg.addChild(this.background.stage);
+        //this.background._viewInternal.width = this.renderer.width;
+       //this.background._viewInternal.height = this.renderer.height;
+        this.layers.bg.addChild(this.background._viewInternal);
 
         this.layers.bg.alpha = 0.4;
 
-        this.level = new Level(this);
 
         this.activeStage = null;
 
@@ -69,6 +68,7 @@ module.exports = class Game extends EventEmitter{
 
         this._initDebug();
 
+        this.level = new Level(this);
         this.init();
 
         global.ds.event.listen( 'status/' + this.id + '/.*', this._playerOnlineStatusChanged.bind( this ) );
@@ -121,7 +121,20 @@ module.exports = class Game extends EventEmitter{
         } else {
             this.removePlayer( id );
         }
+    }
 
+    activateStage(stage) {
+        if(this.activeStage !== null) {
+            this.activeStage._deactivate();
+            this.layers.game.removeChild(this.activeStage._viewInternal);
+        }
+
+        this.layers.game.addChild(stage._viewInternal);
+        stage._activate();
+        this.activeStage = stage;
+    }
+
+    _verifyStage() {
         if(this.players.length === 0) {
             if(this.activeStage === this.gameStage) {
                 this.activateStage(this.mainStage);
@@ -134,23 +147,13 @@ module.exports = class Game extends EventEmitter{
         }
     }
 
-    activateStage(stage) {
-        if(this.activeStage !== null) {
-            this.activeStage._deactivate();
-            this.layers.game.removeChild(this.activeStage.stage);
-        }
-
-        this.layers.game.addChild(stage.stage);
-        stage._activate();
-        this.activeStage = stage;
-    }
-
     addPlayer( id , dsUser =false) {
         var p = new Player( this, id, dsUser );
         this.players.push( p );
         this.level.addPlayer(p);
         console.log("Added player", p);
         this.on( 'update', p._update.bind( p ) );
+        this._verifyStage();
         return p;
     }
 
@@ -163,6 +166,7 @@ module.exports = class Game extends EventEmitter{
                 console.log("Removed player", p);
             }
         }
+        this._verifyStage();
     }
 
     _tick(currentTime) {
@@ -183,7 +187,7 @@ module.exports = class Game extends EventEmitter{
         this.renderer.render( this.rootStage );
 
         requestAnimationFrame( this._tick.bind( this ) );
-        //PIXI.keyboardManager.update();
+        PIXI.keyboardManager.update();
     }
 
     _initDebug() {
@@ -232,7 +236,7 @@ module.exports = class Game extends EventEmitter{
 
     _updateDebug() {
         var mouse = this.renderer.plugins.interaction.mouse.global;
-        var cellPos = this.level.getCellPoint(mouse.x, mouse.y);
+        var cellPos = this.level.getCellPosFromPoint(mouse.x, mouse.y);
         this._mouseDebug.text = "Cursor: (x: " + mouse.x + ", y: " + mouse.y + ") Cell: (x: " + cellPos.x + ", y: " + cellPos.y + ")";
     }
 };

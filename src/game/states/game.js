@@ -5,6 +5,7 @@
 const PIXI = require( 'pixi.js' );
 const State = require('./state');
 const Level = require('../level/level');
+const Viewport = require('../level/viewport');
 
 module.exports = class Game extends State {
     constructor(game) {
@@ -13,9 +14,13 @@ module.exports = class Game extends State {
     }
 
     onInit() {
-        //this.stage.backgroundColor = 0x000000;
-        this.game.level.stage.pivot.set(0.5);
-        this.stage.addChild(this.game.level.stage);
+        //this._viewInternal.backgroundColor = 0x000000;
+        //this.game.level._viewInternal.pivot.set(0.5);
+        //this._viewInternal.addChild(this.game.level._viewInternal);
+
+        this.game.level.viewport.setPosition(100,100);
+        this.game.level.viewport.setSize(this.game.renderer.width - 200, this.game.renderer.height - 200);
+        this._viewInternal.addChild(this.game.level.view);
 
         this.gameIdText = new PIXI.Text("Game Code: " + this.game.id, {
             fontWeight: 'bold',
@@ -35,7 +40,7 @@ module.exports = class Game extends State {
         this.gameIdText.anchor.set(1,0);
         this.gameIdText.x = this.game.renderer.width-10;
         this.gameIdText.y = 10;
-        this.stage.addChild(this.gameIdText);
+        this._viewInternal.addChild(this.gameIdText);
     }
 
     onUpdate() {
