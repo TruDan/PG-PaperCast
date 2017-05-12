@@ -38,7 +38,7 @@ const TINTS = [
     [0x607D8B,0xCFD8DC,0x263238]
 ];
 
-const SPEED = 4;
+const SPEED = 0.25;
 
 module.exports = class Player extends Entity {
     constructor(game, level, id, dsUser=false) {
@@ -113,7 +113,7 @@ module.exports = class Player extends Entity {
         return (this.level.containsPoint(targetX, targetY));
     }
 
-    _updateMove() {
+    _updateMove(dt) {
         if(!this.isAlive || !this._isMoving) return;
 
         // Only change their direction when fully in a grid cell
@@ -126,8 +126,8 @@ module.exports = class Player extends Entity {
             return;
 
         let movePoint = this._getDirectionPoint(this._direction);
-        let targetX = this.x + (movePoint.x * SPEED);
-        let targetY = this.y + (movePoint.y * SPEED);
+        let targetX = this.x + (movePoint.x * SPEED * dt);
+        let targetY = this.y + (movePoint.y * SPEED * dt);
 
         // normalise to cell pos
         var cellPos = this.getCurrentCell();
@@ -223,11 +223,11 @@ module.exports = class Player extends Entity {
         this._debugPos.text = "Player(" + this.name + ")\tPosition: (x: " + this.x + ", y: " + this.y + ") \tCell: (x: " + cellPoint.x + ", y: "+ cellPoint.y + ") [" + ((this.x - this.level.gridOffset.x) % this.level.cellSize) + "," + ((this.y - this.level.gridOffset.y) % this.level.cellSize) + "]" + (!this.isAlive ? "!!DEAD!!" : "");
     }
 
-    _update() {
+    _update(dt) {
         if(!this.isAlive) return;
 
-        this.width = 32;
-        this.height = 32;
+        //this.width = 32;
+        //this.height = 32;
         this._updateGraphics();
         this._updateDebug();
 
@@ -248,14 +248,14 @@ module.exports = class Player extends Entity {
             }
         }
 
-        this._updateMove();
+        this._updateMove(dt);
         this._checkCollision();
         this._checkClaimConditions();
     }
 
     _updateGraphics() {
         // update gfx position
-        this._parts.label = this.name === "" ? "---" : this.name;
+        this._parts.label.text = this.name === "" ? "---" : this.name;
     }
 
     _initGraphics() {
@@ -264,10 +264,12 @@ module.exports = class Player extends Entity {
 
         this._parts.body = new PIXI.Sprite(texture);
         this._parts.body.tint = this.tint[0];
-        this._parts.body.height = 32;
-        this._parts.body.width = 32;
-        this._parts.body.anchor.x = 0;
-        this._parts.body.anchor.y = 0;
+        this._parts.body.height = this._width;
+        this._parts.body.width = this._width;
+        this._parts.body.anchor.x = 0.5;
+        this._parts.body.anchor.y = 0.5;
+        this._parts.body.position.x = this._width / 2;
+        this._parts.body.position.y = this._height / 2;
         //this._parts.body.filters = [new PIXIExtras.GlowFilter(4, 2, 0, this.tint[2], 0.5)];
         this.addChild(this._parts.body);
 
@@ -276,32 +278,26 @@ module.exports = class Player extends Entity {
         this._parts.caption.width = 32;
         this._parts.caption.height = 30;
         this.addChild(this._parts.caption);
-/*
+
         this._parts.label = new PIXI.Text( this.name === "" ? "---" : this.name, {
-            fontSize: 18,
-            fontFamily: 'Arial',
-            fontStyle: 'bold',
-            fill: this.tint,
-            align : 'center',
+            fontFamily: "Press Start 2P",
+            fill: this.tint[1],
+            fontSize: 12,
+            align: 'center',
             dropShadow: true,
-            dropShadowAlpha: 0.55,
-            dropShadowBlur: 2,
-            dropShadowColor: '#333333',
-            dropShadowDistance: 0,
-            stroke: 'black',
-            strokeThickness: 1.5,
-            lineJoin: 'round',
-            padding: 5,
-            trim: true
+            dropShadowAlpha: 1,
+            dropShadowDistance: 3,
+            dropShadowColor: this.tint[2],
+            strokeThickness: 1,
+            stroke: this.tint[2]
+
         });
-        this._parts.label.height = 30;
-        this._parts.label.width = this.width;
-        this._parts.label.position.x = this.width / 2;
-        this._parts.label.position.y = 15;
         this._parts.label.anchor.x = 0.5;
-        this._parts.label.anchor.y = 1;
+        this._parts.label.anchor.y = 0;
+        this._parts.label.position.x = this._width / 2;
+        this._parts.label.position.y = this._height + 4;
         //this._text.alpha = 50;
-        this._parts.caption.addChild(this._parts.label);*/
+        this._parts.caption.addChild(this._parts.label);
     }
 
 };

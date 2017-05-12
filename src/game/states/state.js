@@ -14,7 +14,7 @@ module.exports = class State {
     onInit() {}
     onActivate() {}
     onDeactivate() {}
-    onUpdate() {}
+    onUpdate(dt) {}
 
     _init() {
         this.onInit();
@@ -31,7 +31,7 @@ module.exports = class State {
     }
 
     _update(msSinceLastFrame, currentTime) {
-        this.onUpdate();
+        this.onUpdate(msSinceLastFrame);
     }
 
 };

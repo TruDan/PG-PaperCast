@@ -189,7 +189,7 @@ module.exports = class Game extends EventEmitter{
     _tick(currentTime) {
 
         var msSinceLastFrame = currentTime - this._lastFrameTime;
-        this.emit( 'update', msSinceLastFrame, currentTime );
+        this.emit( 'update', msSinceLastFrame/1000, currentTime );
 
         if(this.activeStage !== null) {
             this.activeStage._update(msSinceLastFrame, currentTime);

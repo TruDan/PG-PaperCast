@@ -22,14 +22,20 @@ module.exports = class Debug {
 
         var dbg = true;
 
+        var dbgPlayers = false;
+
+        dbgPlayers = true;
+
         if(!dbg)
             return;
 
-        this.player1 = this.game.addPlayer("dffgsdfgsdf");
-        this.player1.name = "Player1";
+        if(dbgPlayers) {
+            this.player1 = this.game.addPlayer("dffgsdfgsdf");
+            this.player1.name = "Player1";
 
-        this.player2 = this.game.addPlayer("fgfgdhdwsw");
-        this.player2.name = "Player2";
+            this.player2 = this.game.addPlayer("fgfgdhdwsw");
+            this.player2.name = "Player2";
+        }
 
         this.viewport = this.game.level.viewport;
 
@@ -94,6 +100,7 @@ module.exports = class Debug {
                     break;
 
                 case PIXI.keyboard.Key.BACK_TICK:
+                case 192:
                     _this.game.setDebug(!_this.game.isDebug);
                     break;
             }

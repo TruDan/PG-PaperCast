@@ -4,6 +4,7 @@
 const Cell = require('./cell');
 const PIXI = require('pixi.js');
 const Viewport = require('./viewport');
+const Overlays = require('./overlays');
 
 var fill = require('flood-fill');
 var zero = require('zeros');
@@ -36,6 +37,7 @@ module.exports = class Level {
             grid: new PIXI.Graphics(),
             cells: new PIXI.Container(),
             players: new PIXI.Container(),
+            overlays: new Overlays()
         };
 
         this.options = null;
@@ -44,7 +46,7 @@ module.exports = class Level {
         this.players = [];
 
         this.viewport = new Viewport(this._game);
-        this.viewport.contentView.addChild(this._parts.grid, this._parts.cells, this._parts.players);
+        this.viewport.contentView.addChild(this._parts.grid, this._parts.cells, this._parts.players, this._parts.overlays);
 
         this.view = this.viewport.view;
 
@@ -80,14 +82,18 @@ module.exports = class Level {
 
         fill(grid, 0, 0, 2);
 
+        var c = 0;
         // Now inverse the fill, and this is the players claimed area.
         for(var x = 1; x < cols; x++) {
             for(var y = 1; y < rows; y++) {
                 if(grid.get(x,y) !== 2) {
-                    this.getCell(x-1,y-1).claim(player);
+                    var cell = this.getCell(x-1, y-1);
+                    if(cell.owner !== player) c++;
+                    cell.claim(player);
                 }
             }
         }
+        return c;
     }
 
     revokeAllClaims(player) {
@@ -131,14 +137,17 @@ module.exports = class Level {
     }
 
     _claimTrail(player) {
+        var c = 0;
         for(var x = 0; x < this.cols; x++) {
             for(var y = 0; y < this.rows; y++) {
                 var cell = this.getCell(x,y);
-                if(cell.trailOwner === player) {
+                if(cell.trailOwner === player && cell.owner !== player) {
+                    c++;
                     cell.claim(player);
                 }
             }
         }
+        return c;
     }
 
     claimCell(player) {
@@ -151,11 +160,17 @@ module.exports = class Level {
 
         if(cell.owner === player) {
             // Check player claims
+            var c = 0;
             cell.claim(player);
-            this._claimTrail(player);
-            this.updateClaims(player);
+            c += this._claimTrail(player);
+            c += this.updateClaims(player);
+
+            if(c > 0) {
+                this._parts.overlays.addText("+" + c, player.x, player.y - 50, 25, player.tint[0], player.tint[2], 0.5);
+            }
         }
         else if(cell.trailOwner !== null && cell.trailOwner !== player) {
+            this._parts.overlays.addText(cell.trailOwner.name + " Eliminated!", cell.trailOwner.x, cell.trailOwner.y - 50, 25, player.tint[0], player.tint[2], 0.75);
             cell.trailOwner.kill();
         }
         cell.trail(player);
@@ -191,8 +206,8 @@ module.exports = class Level {
         for( var i = 0; i < this.players.length; i++ ) {
             if( this.players[i]._id === player._id ) {
                 var p = this.players[i];
-                p.kill();
                 this.players.splice( i, 1 );
+                p.kill();
 
                 this.viewport.removeEntity(player);
                 this.viewport.untrackEntity(player);
@@ -250,8 +265,9 @@ module.exports = class Level {
         }
     }
 
-    _update() {
-        this.viewport._update();
+    _update(dt) {
+        this._parts.overlays._update(dt);
+        this.viewport._update(dt);
     }
 };
 

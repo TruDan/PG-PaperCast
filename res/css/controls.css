@@ -14,6 +14,16 @@ body{
     overflow: hidden;
 }
 
+body > .valign-wrapper {
+    height: 100%;
+}
+
+img.logo {
+    display:block;
+    margin: 50px auto;
+    max-width: 100%;
+}
+
 .overlay{
     position: absolute;
     background: #212121;
@@ -23,15 +33,144 @@ body{
     height: 100%;
     z-index: 2;
 }
-.overlay > section {
-    width: 70%;
-    height: 100%;
-    margin: 0 auto;
-    box-sizing: border-box;
-    padding: 2%;
+
+.connection-indicator > .connected,.connection-indicator > .warn,  .connection-indicator > .disconnected { display:none;}
+.connection-indicator.connected > .connected { display:inline-block;}
+.connection-indicator.warn > .warn { display:inline-block;}
+.connection-indicator.disconnected > .disconnected { display:inline-block;}
+
+.connection-indicator {
+    text-align: center;
+}
+
+.connection-indicator .chip {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.connection-indicator .chip .material-icons {
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 32px;
+    padding-right: 8px;
+    float:left;
+}
+
+.collapsible li + li:not(.active) {
+    margin-top: 0.5rem !important;
+}
+
+.collapsible-header {
+    position: relative;
+    font-family: "Press Start 2P", monospace;
+    text-align: center;
+    border-bottom:none;
+}
+
+.collapsible-header > i.material-icons {
+    display: inline-block;
+    float:right;
+    margin-right: 0;
+    margin-left: -2rem
+}
+
+.collapsible.collapsible-open li {
+    opacity: 0.55;
+}
+
+.collapsible.collapsible-open li.active {
+    opacity: 1;
+}
+
+.collapsible-body {
+    border-bottom:none;
+}
+.btn i.cast-icon,
+.btn-floating i.cast-icon,
+.btn-large i.cast-icon,
+.btn-flat i.cast-icon {
+    font-size: 1.6rem;
+}
+
+.btn i.cast-icon > svg,
+.btn-floating i.cast-icon > svg,
+.btn-large i.cast-icon > svg,
+.btn-flat i.cast-icon > svg {
+    height: 1.6rem;
+}
+
+#new-game input {
+    border-bottom-color: #FFEB3B;
+}
+
+#new-game input+label {
+    color: #FFEB3B;
+}
+
+#new-game input:focus:not([readonly]) {
+    border-bottom-color: #F57F17;
+    box-shadow: 0 1px 0 0 #F57F17;
+}
+#new-game input:focus:not([readonly])+label {
+    color: #F57F17;
+}
+
+#join-game input {
+    border-bottom-color: #03A9F4;
+}
+
+#join-game input+label {
+    color: #03A9F4;
+}
+
+#join-game input:focus:not([readonly]) {
+    border-bottom-color: #01579B;
+    box-shadow: 0 1px 0 0 #01579B;
+}
+#join-game input:focus:not([readonly])+label {
+    color: #01579B;
+}
+
+#overlay .btn {
+    display: block;
+    width: 100%;
+    font-family: "Press Start 2P", monospace;
+}
+
+.btn-retro {
+    font-family: "Press Start 2P", monospace;
+    font-size: 0.8rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.card.card-dpad .card-content {
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
+    align-items: stretch;
+}
+
+.card.card-dpad .card-content > div {
+    display: flex;
+    flex: 1;
     justify-content: center;
+    align-items: stretch;
+}
+
+.card.card-dpad .card-content  > div > a.btn-floating {
+    width: 33%;
+    height: 100%;
+}
+
+.card.card-dpad .card-content  > div > a.btn-floating + a.btn-floating {
+    margin-left: auto;
+}
+
+.card.card-dpad .card-content  > div > a.btn-floating > i {
+    position: absolute;
+    top: 10px;
+    left: 10px;
 }
 
 #controls {
@@ -105,29 +244,57 @@ body{
     opacity: 0.6;
     background-image: url(img/android-expand.svg);
 }
-
-.connection-indicator.red{
-    background-position: 0 0;
+.cast-icon > svg {
+    fill: #F9A825;
+    opacity: 0.75;
+}
+.cast-icon > svg #e {
+    opacity: 0;
+}
+.cast-icon.cast-inactive > svg {
+    opacity: 1;
+}
+.cast-icon.cast-active > svg {
+    fill: #80DEEA;
+    opacity: 1;
+}
+.cast-icon.cast-active > svg #e {
+    opacity: 1;
+}
+.cast-icon.cast-connect > svg {
+    opacity: 1;
+}
+.cast-icon.cast-connect > svg #d {
+    opacity: 0.5;
+}
+.cast-icon.cast-connect > svg #a, .cast-icon.cast-connect > svg #b, .cast-icon.cast-connect > svg #c {
+    animation: cast-icon-connect 0.99s infinite normal forwards steps(2, start);
+}
+.cast-icon.cast-connect > svg #b {
+    animation-delay: .33s;
+}
+.cast-icon.cast-connect > svg #c {
+    animation-delay: .66s;
+}
+.cast-icon.cast-warn > svg {
+    fill: #FFC400;
+    opacity: 1;
 }
 
-.connection-indicator.yellow{
-    background-position: 0 50%;
-}
-
-.connection-indicator.green{
-    background-position: 0 100%;
-}
-
-.connection-indicator{
-    width: 40%;
-    height: 20%;
-    left: 30%;
-    position: absolute;
-    bottom: 10%;
-    background-size: cover;
-    background-image: url(../img/connection-state.svg);
-}
-
-.center{
-    width: 10%;
+@keyframes cast-icon-connect {
+    0% {
+        opacity: 0.5;
+    }
+    25% {
+        opacity: 0.5;
+    }
+    50% {
+        opacity: 0.5;
+    }
+    75% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0.5;
+    }
 }

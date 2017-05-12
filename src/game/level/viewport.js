@@ -126,7 +126,7 @@ module.exports = class Viewport {
         this.contentView.position.set(-this.camera.x + (this.width/2), -this.camera.y + (this.height/2));
     }
 
-    __updateEntities() {
+    __updateEntities(dt) {
         for(var i=0;i<this.entities.length;i++) {
             var e = this.entities[i];
             //console.log(bounds, e.position, bounds.contains(e.position.x, e.position.y));
@@ -137,14 +137,14 @@ module.exports = class Viewport {
             e.renderable = (
                 (x1 > 0 || x2 > 0) && (y1 > 0 || y2 > 0) && (x1 < this.width || x2 < this.width) && (y1 < this.height || y2 < this.height)
             );
-            e.__update();
+            e.__update(dt);
         }
     }
 
-    _update() {
+    _update(dt) {
         this._updateDebug();
 
-        this.__updateEntities();
+        this.__updateEntities(dt);
 
         if(this.trackEntities) {
             if(this.tracking.length > 0) {

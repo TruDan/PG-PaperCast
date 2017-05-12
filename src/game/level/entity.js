@@ -9,8 +9,8 @@ module.exports = class Entity extends PIXI.Graphics {
         super();
         this.level = level;
 
-        //this.width = width;
-        //this.height = height;
+        this.width = width;
+        this.height = height;
 
         this._parts = {};
         this._dirty = true;
@@ -24,8 +24,8 @@ module.exports = class Entity extends PIXI.Graphics {
     _initGraphics() {}
     _drawGraphics() {}
 
-    __update() {
-        this._update();
+    __update(dt) {
+        this._update(dt);
         this.__drawGraphics();
     }
 

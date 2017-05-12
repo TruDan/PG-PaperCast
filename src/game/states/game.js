@@ -121,15 +121,15 @@ module.exports = class Game extends State {
         this._viewInternal.addChild(this.game.level.view, this.scoreboard, this._parts.title, this._parts.gameId, this._parts.brandName, this._parts.brandUrl);
     }
 
-    onUpdate() {
+    onUpdate(dt) {
         if(!this.isPaused) {
-            this.game.level._update();
+            this.game.level._update(dt);
         }
         else {
-            this._parts.paused._update();
+            this._parts.paused._update(dt);
         }
 
-        this.scoreboard._update();
+        this.scoreboard._update(dt);
     }
 
 };
