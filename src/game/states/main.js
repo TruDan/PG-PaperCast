@@ -20,8 +20,8 @@ module.exports = class Main extends State {
 
     onUpdate(msSinceLastFrame, currentTime) {
         this.count++;
-        this.titleText.rotation = Math.sin(this.count / 10) * 0.03;
-
+        this.titleText.rotation = Math.sin(this.count / 10) * 0.02;
+        this.titleText.scale.set(1 + Math.cos(this.count / 20) * 0.1);
 
         this.filterCount += 0.1;
 
@@ -53,7 +53,7 @@ module.exports = class Main extends State {
         });
 
         // setting the anchor point to 0.5 will center align the text... great for spinning!
-        this.titleText.anchor.set(0.5);
+        this.titleText.anchor.set(0.5, 0.5);
         this.titleText.x = this.game.renderer.width / 2;
         this.titleText.y = this.game.renderer.height / 3;
 

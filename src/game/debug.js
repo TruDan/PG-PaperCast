@@ -20,11 +20,20 @@ module.exports = class Debug {
         this.game = new Game(window.document.body);
         window.document.body.aGame = this.game;
 
+        var dbg = true;
+
+        if(!dbg)
+            return;
+
         this.player1 = this.game.addPlayer("dffgsdfgsdf");
         this.player1.name = "Player1";
-        //this.player2 = this.game.addPlayer("2");
+
+        this.player2 = this.game.addPlayer("fgfgdhdwsw");
+        this.player2.name = "Player2";
 
         this.viewport = this.game.level.viewport;
+
+        this.game.activateStage(this.game.gameStage);
 
         console.log(this);
 
@@ -74,7 +83,19 @@ module.exports = class Debug {
                 case PIXI.keyboard.Key.NUM_3:
                     _this.viewport.zoomCamera(-0.05);
                     break;
+            }
+        });
 
+        PIXI.keyboardManager.on('pressed', function(key){
+            switch (key) {
+
+                case PIXI.keyboard.Key.ESCAPE:
+                    _this.game.gameStage.setPaused(!_this.game.gameStage.isPaused);
+                    break;
+
+                case PIXI.keyboard.Key.BACK_TICK:
+                    _this.game.setDebug(!_this.game.isDebug);
+                    break;
             }
         });
     }

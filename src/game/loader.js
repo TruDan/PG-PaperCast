@@ -22,12 +22,33 @@ class Loader{
     constructor() {
         this._connectionReady = false;
         this._imagesReady = false;
+        this._fontsReady = false;
         //this._imagesReady = true;
         this._callback = null;
 
         // Create the image loader and add the initial assets
         this._assetLoader = new PIXI.loaders.Loader();
         this._assetLoader.add( 'player', '/res/img/player.png' );
+
+        var _this = this;
+        window.WebFontConfig = {
+            google: {
+                families: ['Press+Start+2P']
+            },
+
+            active: function() {
+                // do something
+                _this._onFontsLoaded();
+            }
+        };
+
+        var wf = document.createElement('script');
+        wf.src = ('https:' === document.location.protocol ? 'https' : 'http') +
+            '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+        wf.type = 'text/javascript';
+        wf.async = 'true';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(wf, s);
 
         // Once all images are loaded, check if we're good to go
         this._assetLoader.once( 'complete', this._onImagesLoaded.bind( this ) );
@@ -59,6 +80,11 @@ class Loader{
         this._checkReady();
     }
 
+    _onFontsLoaded() {
+        this._fontsReady = true;
+        this._checkReady();
+    }
+
     /**
      * Callback once the connection to the deepstream server
      * is established and authenticated
@@ -81,6 +107,7 @@ class Loader{
     _checkReady() {
         if(
             this._connectionReady &&
+            this._fontsReady &&
             this._imagesReady
         ) {
             this._callback();

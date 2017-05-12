@@ -9,10 +9,10 @@ var fill = require('flood-fill');
 var zero = require('zeros');
 
 const defaultOptions = {
-    rows: 32,
-    cols: 32,
+    rows: 64,
+    cols: 64,
 
-    borderWidth: 10,
+    borderWidth: 32,
     cellSize: 32,
     cellLineColor: 0x909090
 };
@@ -27,18 +27,16 @@ module.exports = class Level {
         this.cellSize = this.options.cellSize;
         this.borderWidth = this.options.borderWidth;
 
-        this.maxX = (this.cols * this.cellSize) + (2*this.borderWidth);
-        this.maxY = (this.rows * this.cellSize) + (2*this.borderWidth);
+        this.width = (this.cols * this.cellSize) + (2*this.borderWidth);
+        this.height = (this.rows * this.cellSize) + (2*this.borderWidth);
 
         this.gridOffset = new PIXI.Point(this.borderWidth, this.borderWidth);
 
-        this.tiles = new PIXI.Graphics();
-        this._stage = new PIXI.Container();
-        this._stagePlayers = new PIXI.Container();
-        this._viewInternal = new PIXI.Container();
-
-//        this._viewInternal.width = this.maxX;
-//        this._viewInternal.height = this.maxY;
+        this._parts = {
+            grid: new PIXI.Graphics(),
+            cells: new PIXI.Container(),
+            players: new PIXI.Container(),
+        };
 
         this.options = null;
         this.cells = [];
@@ -46,7 +44,7 @@ module.exports = class Level {
         this.players = [];
 
         this.viewport = new Viewport(this._game);
-        this.viewport.contentView.addChild(this._viewInternal);
+        this.viewport.contentView.addChild(this._parts.grid, this._parts.cells, this._parts.players);
 
         this.view = this.viewport.view;
 
@@ -54,58 +52,10 @@ module.exports = class Level {
     }
 
     init() {
-        this._stage.addChild(this.tiles);
-        this._viewInternal.addChild(this._stage);
-        this._viewInternal.addChild(this._stagePlayers);
-        this.tiles.clear();
-
-        this.drawCells();
-        this.drawGrid();
+        this._initCells();
+        this._drawGrid();
     };
 
-    drawGrid() {
-        this.tiles.clear();
-
-        this.tiles.lineStyle(1, 0x777777, 0.2);
-
-        for(let x=0; x<=this.cols; x++) {
-            let lineX = this.gridOffset.x + (x * this.cellSize);
-            this.tiles.moveTo(lineX, this.gridOffset.y);
-            this.tiles.lineTo(lineX, this.maxY - this.gridOffset.y);
-        }
-
-        for(let y=0; y<=this.rows;y++) {
-            let lineY = this.gridOffset.y + (y * this.cellSize);
-            this.tiles.moveTo(this.gridOffset.x, lineY);
-            this.tiles.lineTo(this.maxX-this.gridOffset.x, lineY);
-        }
-
-        // draw borders
-        var hw = this.borderWidth/2;
-        this.tiles.lineStyle(this.borderWidth, 0x000000, 0.8);
-        this.tiles.moveTo(hw,hw);
-        this.tiles.lineTo(hw,this.maxY-hw);
-        this.tiles.lineTo(this.maxX-hw,this.maxY-hw);
-        this.tiles.lineTo(this.maxX-hw,hw);
-        this.tiles.lineTo(hw,hw);
-
-/*
-        var textStyle = { fontSize: 12, fontFamily: 'monospace', fill: 'rgb(0,0,0)', align : 'center', trim: true };
-        for(var x=0; x<this.width; x++) {
-            for(var y=0; y<this.width;y++) {
-
-                var text = new PIXI.Text( x + "," + y, textStyle );
-                text.alpha = 0.2;
-                text.position.x = x * this.cellSize + (0.5 * this.cellSize);
-                text.position.y = y * this.cellSize + (0.5 * this.cellSize);
-                text.anchor.x = 0.5;
-                text.anchor.y = 0.5;
-
-                //this._stage.addChild( text );
-            }
-        }
-*/
-    }
 
     updateClaims(player) {
         var cols = this.cols + 2;
@@ -147,6 +97,9 @@ module.exports = class Level {
                 if(cell.owner === player) {
                     cell.unclaim();
                 }
+                if(cell.trailOwner === player) {
+                    cell.untrail();
+                }
             }
         }
         this.updateClaims(player);
@@ -164,24 +117,72 @@ module.exports = class Level {
         return false;
     }
 
-    drawCells() {
-        for(var x=0;x<this.cols;x++) {
-            for(var y=0;y<this.rows;y++) {
-                var cell = new Cell(this, x, y);
-                this.cells[(x * this.rows) + y] = cell;
-                cell._paint(this.tiles);
+    countClaims(player) {
+        var i = 0;
+        for(var x = 0; x < this.cols; x++) {
+            for(var y = 0; y < this.rows; y++) {
+                var cell = this.getCell(x,y);
+                if(cell.owner === player) {
+                    i++;
+                }
+            }
+        }
+        return i;
+    }
+
+    _claimTrail(player) {
+        for(var x = 0; x < this.cols; x++) {
+            for(var y = 0; y < this.rows; y++) {
+                var cell = this.getCell(x,y);
+                if(cell.trailOwner === player) {
+                    cell.claim(player);
+                }
             }
         }
     }
 
+    claimCell(player) {
+        if(!player.isAlive) return;
+
+        var p = this.getCellPosFromPoint(player.x, player.y);
+        var cell = this.getCell(p.x, p.y);
+
+        if(cell === null) return;
+
+        if(cell.owner === player) {
+            // Check player claims
+            cell.claim(player);
+            this._claimTrail(player);
+            this.updateClaims(player);
+        }
+        else if(cell.trailOwner !== null && cell.trailOwner !== player) {
+            cell.trailOwner.kill();
+        }
+        cell.trail(player);
+    }
+
     addPlayer(player) {
-        var pos = this.getPointFromCell(Math.floor((this.cols-4) * Math.random()), Math.floor((this.rows-4) * Math.random()));
+        var x = Math.floor((this.cols * 0.7) * Math.random()) + Math.floor(this.cols * 0.15);
+        var y = Math.floor((this.rows * 0.7) * Math.random()) + Math.floor(this.rows * 0.15);
+        var pos = this.getPointFromCell(x, y);
 
         this.players.push(player);
-        this.viewport.addEntity(player.view);
+
+        this._parts.players.addChild(player);
+
+        this.viewport.addEntity(player);
         this.viewport.trackEntity(player);
-        this._stagePlayers.addChild(player._trail._gfx, player.view);
-        player.respawn(this, pos.x, pos.y);
+
+        player.respawn(pos.x, pos.y);
+
+        // Claim a 3x3
+        for(var i=-1;i<=1;i++) {
+            for(var j=-1;j<=1;j++) {
+                var cell = this.getCell(x + i, y + j);
+                cell.claim(player);
+            }
+        }
+
 
         player._initDebug();
     }
@@ -192,14 +193,20 @@ module.exports = class Level {
                 var p = this.players[i];
                 p.kill();
                 this.players.splice( i, 1 );
-                this.viewport.removeEntity(player.view);
+
+                this.viewport.removeEntity(player);
                 this.viewport.untrackEntity(player);
-                this._stagePlayers.removeChild(player._trail._gfx, player.view);
+
+                this._parts.players.removeChild(player);
             }
         }
     }
 
     getCell(x, y) {
+        if(x >= this.cols || x < 0 || y >= this.rows || y < 0) {
+            return null;
+        }
+
         return this.cells[(x * this.rows) + y];
     }
 
@@ -217,6 +224,30 @@ module.exports = class Level {
 
     containsPoint(x, y) {
         return(x >= this.gridOffset.x && y >= this.gridOffset.y && x <= this.gridOffset.x + ((this.cols-1) * this.cellSize) && y <= this.gridOffset.y + ((this.rows-1) * this.cellSize));
+    }
+
+    _drawGrid() {
+        this._parts.grid.clear();
+
+        // draw borders
+        var hw = this.borderWidth/2;
+        this._parts.grid.lineStyle(this.borderWidth, 0x111111, 0.8);
+        this._parts.grid.moveTo(hw,hw);
+        this._parts.grid.lineTo(hw,this.height-hw);
+        this._parts.grid.lineTo(this.width-hw,this.height-hw);
+        this._parts.grid.lineTo(this.width-hw,hw);
+        this._parts.grid.lineTo(hw,hw);
+    }
+
+    _initCells() {
+        for(var x=0;x<this.cols;x++) {
+            for(var y=0;y<this.rows;y++) {
+                var cell = new Cell(this, x, y, this.cellSize);
+                this.cells[(x * this.rows) + y] = cell;
+                this._parts.cells.addChild(cell);
+                this.viewport.addEntity(cell);
+            }
+        }
     }
 
     _update() {

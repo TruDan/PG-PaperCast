@@ -2,7 +2,8 @@
  * Created by truda on 09/05/2017.
  */
 const PIXI = require( 'pixi.js' );
-const Trail = require('./trail');
+const Entity = require('../level/entity');
+const PIXIExtras = require('pixi-extra-filters');
 //const keyboard = require('pixi-keyboard');
 const $ = require('jquery');
 
@@ -16,21 +17,32 @@ const Direction = {
 };
 
 const TINTS = [
-    0x00FF00,
-    0x66FFAA,
-    0x00FFFF,
-    0xFF00FF,
-    0xFFAAFF,
-    0x00FF33,
-    0x99FF44,
-    0xFFFF00,
-    0xFF6600
+    [0xf44336,0xffcdd2,0xb71c1c],
+    [0xE91E63,0xF8BBD0,0x880E4F],
+    [0x9C27B0,0xE1BEE7,0x4A148C],
+    [0x673AB7,0xD1C4E9,0x311B92],
+    [0x3F51B5,0xC5CAE9,0x1A237E],
+    [0x2196F3,0xBBDEFB,0x0D47A1],
+    [0x03A9F4,0xB3E5FC,0x01579B],
+    [0x00BCD4,0xB2EBF2,0x006064],
+    [0x009688,0xB2DFDB,0x004D40],
+    [0x4CAF50,0xC8E6C9,0x1B5E20],
+    [0x8BC34A,0xDCEDC8,0x33691E],
+    [0xCDDC39,0xF0F4C3,0x827717],
+    [0xFFEB3B,0xFFF9C4,0xF57F17],
+    [0xFFC107,0xFFECB3,0xFF6F00],
+    [0xFF9800,0xFFE0B2,0xE65100],
+    [0xFF5722,0xFFCCBC,0xBF360C],
+    [0x795548,0xD7CCC8,0x3E2723],
+    [0x9E9E9E,0xF5F5F5,0x212121],
+    [0x607D8B,0xCFD8DC,0x263238]
 ];
 
 const SPEED = 4;
 
-module.exports = class Player {
-    constructor(game, id, dsUser=false) {
+module.exports = class Player extends Entity {
+    constructor(game, level, id, dsUser=false) {
+        super(level, 32, 32);
         this._id = id;
         this._game = game;
         this._dsUser = dsUser;
@@ -41,44 +53,21 @@ module.exports = class Player {
         // public properties
         this.name = "";
         this.tint = this._getTint();
-        this.level = null;
-
-        this.width = 32;
-        this.height = 32;
-
-        this.x = 0;
-        this.y = 0;
 
         this.isAlive = false;
         this._isMoving = false;
         this._direction = Direction.NONE;
         this._nextDirection = Direction.NONE;
-
-        this._trail = new Trail(this);
-
-        this._initGraphics();
-
-        this.reset();
     }
 
-    respawn(level, x, y) {
-        this.level = level;
-
+    respawn(x, y) {
         this.x = x;
         this.y = y;
 
-        this._updateGraphics();
-        this.reset();
-
-        // Claim a 3x3
-        var cellPos = this.getCurrentCell();
-        for(var i=-1;i<=1;i++) {
-            for(var j=-1;j<=1;j++) {
-                this._claimCell(cellPos.x + i, cellPos.y + j);
-            }
-        }
+        this.alpha = 1;
 
         this.isAlive = true;
+        console.log("Spawned Player ", this._id, this.name, this.x, this.y);
     }
 
     move(direction) {
@@ -92,40 +81,31 @@ module.exports = class Player {
         this._isMoving = true;
     }
 
-    reset() {
-        this.isAlive = false;
-        this.view.alpha = 1;
-        this._trail.reset();
-    }
-
     kill() {
+        if(!this.isAlive) return;
         this.isAlive = false;
-        this.view.alpha = 0;
 
         this._isMoving = false;
         this._direction = Direction.NONE;
-        this._trail.reset();
 
         this.level.revokeAllClaims(this);
 
-        console.log("Killed Player ", this._id, this.name);
+        console.log("Killed Player ", this._id, this.name, this.x, this.y);
         this.remove();
     }
 
     remove() {
         if(this._record !== undefined)
             this._record.delete();
+
+        this.renderable = false;
         this._game._removeDebugInfo(this._debugPos);
+        this.level.removePlayer(this);
+        // this.destroy();
     }
 
     getCurrentCell() {
         return this.level.getCellPosFromPoint(this.x, this.y);
-    }
-
-    isCollidingWith(player) {
-        if(!this.isAlive || !player.isAlive) return false;
-
-        return (player._trail.containsPoint(this.x, this.y));
     }
 
     _canMove(targetX, targetY) {
@@ -171,15 +151,10 @@ module.exports = class Player {
         }
 
         if(this._canMove(targetX, targetY)) {
-            if((this.x - this.level.gridOffset.x) % cellSize === 0 && (this.y - this.level.gridOffset.y) % cellSize === 0) {
-                this._checkClaimedCells();
-            }
-
             this.x = Math.floor(targetX);
             this.y = Math.floor(targetY);
-            //this._game._viewInternal.target.x = this.x;
-            //this._game._viewInternal.target.y = this.y;
-            this._trail.addPoint(this.x, this.y);
+
+            this.level.claimCell(this);
         }
         else {
             // snap to nearest grid tile
@@ -187,29 +162,6 @@ module.exports = class Player {
             this.x = cp.x;
             this.y = cp.y;
             this._direction = Direction.NONE;
-        }
-    }
-
-    _claimCell(x,y) {
-        //console.log("Player " + this.name + " is claiming " + x + "," + y);
-        var cell = this.level.getCell(x,y);
-        cell.claim(this);
-        cell._paint(this.level.tiles);
-    }
-
-    _checkClaimedCells() {
-        var cellPos = this.getCurrentCell();
-        var cell = this.level.getCell(cellPos.x, cellPos.y);
-        if(cell.owner === this) {
-            // Claim all cells in this path and reset path.
-            var points = [...this._trail.points];
-            for(var i=0; i<points.length;i++) {
-                var p = points[i];
-                this._claimCell(p.x, p.y);
-            }
-            this.level.updateClaims(this);
-
-            this._trail.reset();
         }
     }
 
@@ -241,14 +193,11 @@ module.exports = class Player {
     _checkCollision() {
         if(!this.isAlive) return;
 
-        for(let i=0; i<this.level.players.length;i++) {
-            var player = this.level.players[i];
-            //if(player === this) continue;
-
-            if(this.isCollidingWith(player)) {
-                this._game.removePlayer(this._id);
-            }
-        }
+         var cellPos = this.getCurrentCell();
+         var cell = this.level.getCell(cellPos.x, cellPos.y);
+         if(cell.trailOwner !== null && cell.trailOwner !== this) {
+             cell.trailOwner.kill();
+         }
     }
 
     _getTint() {
@@ -270,13 +219,15 @@ module.exports = class Player {
     _updateDebug() {
         var cellPoint = this.getCurrentCell();
 
-        this._debugPos.style.fill = this.isAlive ? "rgb(255,255,255)" : "rgb(255,32,32)";
+        this._debugPos.style.fill = this.isAlive ? this.tint[1] : "rgb(255,32,32)";
         this._debugPos.text = "Player(" + this.name + ")\tPosition: (x: " + this.x + ", y: " + this.y + ") \tCell: (x: " + cellPoint.x + ", y: "+ cellPoint.y + ") [" + ((this.x - this.level.gridOffset.x) % this.level.cellSize) + "," + ((this.y - this.level.gridOffset.y) % this.level.cellSize) + "]" + (!this.isAlive ? "!!DEAD!!" : "");
     }
 
-    _update( msSinceLastFrame, currentTime ) {
+    _update() {
         if(!this.isAlive) return;
 
+        this.width = 32;
+        this.height = 32;
         this._updateGraphics();
         this._updateDebug();
 
@@ -304,39 +255,29 @@ module.exports = class Player {
 
     _updateGraphics() {
         // update gfx position
-        this.view.position.x = this.x;
-        this.view.position.y = this.y;
-        this._text.text = this.name === "" ? "---" : this.name;
+        this._parts.label = this.name === "" ? "---" : this.name;
     }
 
     _initGraphics() {
-        this.view = new PIXI.Container();
-        this._viewParts = {
-            body: new PIXI.Container(),
-           // trail: this._trail.view
-        };
-        this.view.addChild(this._viewParts.body);
-
         //this._stage.alpha = 0.5;
-        this._viewParts.body.position.x = 0;
-        this._viewParts.body.position.y = 0;
-        this._viewParts.body.pivot.x = 0;
-        this._viewParts.body.pivot.y = 0;
-        this._viewParts.body.height = this.height + 30;
-        this._viewParts.body.width = this.width;
-
         var texture = PIXI.Texture.fromImage('/res/img/player.png');
 
-        this._body = new PIXI.Sprite(texture);
-        this._body.tint = this.tint;
-        this._body.height = this.height;
-        this._body.width = this.width;
-        this._body.anchor.x = 0;
-        this._body.anchor.y = 0;
-        this._viewParts.body.addChild(this._body);
+        this._parts.body = new PIXI.Sprite(texture);
+        this._parts.body.tint = this.tint[0];
+        this._parts.body.height = 32;
+        this._parts.body.width = 32;
+        this._parts.body.anchor.x = 0;
+        this._parts.body.anchor.y = 0;
+        //this._parts.body.filters = [new PIXIExtras.GlowFilter(4, 2, 0, this.tint[2], 0.5)];
+        this.addChild(this._parts.body);
 
 
-        this._text = new PIXI.Text( this.name, {
+        this._parts.caption = new PIXI.Container();
+        this._parts.caption.width = 32;
+        this._parts.caption.height = 30;
+        this.addChild(this._parts.caption);
+/*
+        this._parts.label = new PIXI.Text( this.name === "" ? "---" : this.name, {
             fontSize: 18,
             fontFamily: 'Arial',
             fontStyle: 'bold',
@@ -353,14 +294,14 @@ module.exports = class Player {
             padding: 5,
             trim: true
         });
-        // this._text.height = this.height;
-        // this._text.width = this.width;
-        this._text.position.x = this.width / 2;
-        this._text.position.y = this.height + 30;
-        this._text.anchor.x = 0.5;
-        this._text.anchor.y = 1;
+        this._parts.label.height = 30;
+        this._parts.label.width = this.width;
+        this._parts.label.position.x = this.width / 2;
+        this._parts.label.position.y = 15;
+        this._parts.label.anchor.x = 0.5;
+        this._parts.label.anchor.y = 1;
         //this._text.alpha = 50;
-        this._viewParts.body.addChild( this._text );
+        this._parts.caption.addChild(this._parts.label);*/
     }
 
 };

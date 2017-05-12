@@ -23,6 +23,8 @@ module.exports = class Game extends EventEmitter{
         super();
         this._element = element;
 
+        this.isDebug = false;
+
         this.players = [];
         this.renderer = PIXI.autoDetectRenderer( window.innerWidth, window.innerHeight, {
             transparent: false,
@@ -60,7 +62,7 @@ module.exports = class Game extends EventEmitter{
 
         this.rootStage = new PIXI.Container();
         //this.rootStage.addChild(this.layers.bg);
-        this.rootStage.addChild(this.layers.bg, this.layers.game, this.layers.ui, this.layers.debug);
+        this.rootStage.addChild(this.layers.bg, this.layers.game, this.layers.ui);
 
         this._element.append( this.renderer.view );
 
@@ -75,7 +77,23 @@ module.exports = class Game extends EventEmitter{
 
         this.start();
 
-        requestAnimationFrame( this._tick.bind( this ) );
+        requestAnimationFrame(this._tick.bind( this ));
+    }
+
+    setDebug(debug) {
+        if(debug === undefined) {
+            debug = !this.isDebug;
+        }
+
+        if(debug !== this.isDebug) {
+            this.isDebug = debug;
+            if(debug) {
+                this.rootStage.addChild(this.layers.debug);
+            }
+            else {
+                this.rootStage.removeChild(this.layers.debug);
+            }
+        }
     }
 
     makeid()
@@ -148,11 +166,10 @@ module.exports = class Game extends EventEmitter{
     }
 
     addPlayer( id , dsUser =false) {
-        var p = new Player( this, id, dsUser );
+        var p = new Player( this, this.level, id, dsUser );
         this.players.push( p );
         this.level.addPlayer(p);
         console.log("Added player", p);
-        this.on( 'update', p._update.bind( p ) );
         this._verifyStage();
         return p;
     }
