@@ -19,7 +19,11 @@
   },
   "devDependencies": {
     "browserify-versionify": "^1.0.6",
+    "css-loader": "^0.28.1",
+    "extract-text-webpack-plugin": "^2.1.0",
     "ify-loader": "^1.0.4",
+    "node-sass": "^4.5.2",
+    "sass-loader": "^6.0.5",
     "webpack": "^2.5.1",
     "webpack-dev-server": "^2.4.5"
   },

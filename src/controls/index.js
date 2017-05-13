@@ -2,6 +2,7 @@
  * Created by truda on 10/05/2017.
  */
 const CastSenderClient = require('./cast');
+require('./ui/joystick');
 
 $(function() {
     var DEEPSTREAM_URL = window.location.hostname + ':3002';
@@ -105,9 +106,8 @@ $(function() {
     });
 
     function setSize() {
-        var divWidth = $('.card.card-dpad .card-content').width();
-        $('.card.card-dpad .card-content').height(divWidth);
-        $('.card.card-dpad .card-content i.material-icons').css('font-size', (divWidth / 3) - 20 + "px").css('line-height', (divWidth / 3) - 20 + "px");
+        var divWidth = $('.joystick').width();
+        $('.joystick').height(divWidth);
     }
 
     setSize();
@@ -167,6 +167,8 @@ $(function() {
         $('.collapsible:has(li.active)').addClass('collapsible-open');
         $('.collapsible:not(:has(li.active))').removeClass('collapsible-open');
     }
+
+    $('.joystick').joystick();
 
     $('.collapsible').collapsible({
         onOpen: updateCollapsible,

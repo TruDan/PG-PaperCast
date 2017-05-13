@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css?family=Press+Start+2P|Roboto:regular,bold" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/css/materialize.min.css">
-    <link rel="stylesheet" type="text/css" href="/res/css/controls.css" />
+    <link rel="stylesheet" type="text/css" href="/build/controls.bundle.css" />
 </head>
 <body>
 <div class="valign-wrapper">
@@ -21,8 +21,8 @@
     <div class="row">
         <div class="col s12" style="display:none;">
             <ul id="tabs-controls" class="tabs">
-                <li class="tab col s3"><a class="active" href="#overlay"></a></li>
-                <li class="tab col s3"><a href="#controls"></a></li>
+                <li class="tab col s3"><a href="#overlay"></a></li>
+                <li class="tab col s3"><a class="active" href="#controls"></a></li>
                 <li class="tab col s3"><a href="#game-over"></a></li>
             </ul>
         </div>
@@ -63,17 +63,11 @@
                 <a class="waves-effect waves-light btn deep-orange darken-3 btn-retro"><i class="material-icons left">exit_to_app</i>Leave</a>
                 <a class="waves-effect waves-light btn yellow darken-2 btn-retro right"><i class="material-icons left">pause</i>Pause</a>
             </div>
-            <div class="card card-dpad light-blue darken-4">
-                <div class="card-content white-text">
-                    <div>
-                        <a class="btn-floating btn-large waves-effect light-blue" id="direction_up"><i class="material-icons light-blue-text text-darken-4">arrow_upward</i></a>
-                    </div>
-                    <div>
-                        <a class="btn-floating btn-large waves-effect light-blue" id="direction_left"><i class="material-icons light-blue-text text-darken-4">arrow_back</i></a>
-                        <a class="btn-floating btn-large waves-effect light-blue" id="direction_right"><i class="material-icons light-blue-text text-darken-4">arrow_forward</i></a>
-                    </div>
-                    <div>
-                        <a class="btn-floating btn-large waves-effect light-blue" id="direction_down"><i class="material-icons light-blue-text text-darken-4">arrow_downward</i></a>
+            <div class="row">
+                <div class="col s10 offset-s1">
+                    <div class="joystick">
+                        <div class="joystick-stick"></div>
+                        <div class="joystick-knob"></div>
                     </div>
                 </div>
             </div>

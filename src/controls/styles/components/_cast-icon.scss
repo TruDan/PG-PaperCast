@@ -1,0 +1,55 @@
+
+.cast-icon > svg {
+  fill: #F9A825;
+  opacity: 0.75;
+}
+.cast-icon > svg #e {
+  opacity: 0;
+}
+.cast-icon.cast-inactive > svg {
+  opacity: 1;
+}
+.cast-icon.cast-active > svg {
+  fill: #80DEEA;
+  opacity: 1;
+}
+.cast-icon.cast-active > svg #e {
+  opacity: 1;
+}
+.cast-icon.cast-connect > svg {
+  opacity: 1;
+}
+.cast-icon.cast-connect > svg #d {
+  opacity: 0.5;
+}
+.cast-icon.cast-connect > svg #a, .cast-icon.cast-connect > svg #b, .cast-icon.cast-connect > svg #c {
+  animation: cast-icon-connect 0.99s infinite normal forwards steps(2, start);
+}
+.cast-icon.cast-connect > svg #b {
+  animation-delay: .33s;
+}
+.cast-icon.cast-connect > svg #c {
+  animation-delay: .66s;
+}
+.cast-icon.cast-warn > svg {
+  fill: #FFC400;
+  opacity: 1;
+}
+
+@keyframes cast-icon-connect {
+  0% {
+    opacity: 0.5;
+  }
+  25% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  75% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.5;
+  }
+}

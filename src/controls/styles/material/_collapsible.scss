@@ -1,0 +1,43 @@
+
+.collapsible li + li:not(.active) {
+  margin-top: 0.5rem !important;
+}
+
+.collapsible-header {
+  position: relative;
+  font-family: "Press Start 2P", monospace;
+  text-align: center;
+  border-bottom:none;
+}
+
+.collapsible-header > i.material-icons {
+  display: inline-block;
+  float:right;
+  margin-right: 0;
+  margin-left: -2rem
+}
+
+.collapsible.collapsible-open li {
+  opacity: 0.55;
+}
+
+.collapsible.collapsible-open li.active {
+  opacity: 1;
+}
+
+.collapsible-body {
+  border-bottom:none;
+}
+.btn i.cast-icon,
+.btn-floating i.cast-icon,
+.btn-large i.cast-icon,
+.btn-flat i.cast-icon {
+  font-size: 1.6rem;
+}
+
+.btn i.cast-icon > svg,
+.btn-floating i.cast-icon > svg,
+.btn-large i.cast-icon > svg,
+.btn-flat i.cast-icon > svg {
+  height: 1.6rem;
+}

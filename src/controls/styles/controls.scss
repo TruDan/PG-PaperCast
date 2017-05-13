@@ -1,0 +1,46 @@
+@import "variables";
+@import "base";
+
+@import "./components/all";
+
+@import "./material/all";
+
+
+
+#new-game input {
+  border-bottom-color: #FFEB3B;
+}
+
+#new-game input+label {
+  color: #FFEB3B;
+}
+
+#new-game input:focus:not([readonly]) {
+  border-bottom-color: #F57F17;
+  box-shadow: 0 1px 0 0 #F57F17;
+}
+#new-game input:focus:not([readonly])+label {
+  color: #F57F17;
+}
+
+#join-game input {
+  border-bottom-color: #03A9F4;
+}
+
+#join-game input+label {
+  color: #03A9F4;
+}
+
+#join-game input:focus:not([readonly]) {
+  border-bottom-color: #01579B;
+  box-shadow: 0 1px 0 0 #01579B;
+}
+#join-game input:focus:not([readonly])+label {
+  color: #01579B;
+}
+
+#overlay .btn {
+  display: block;
+  width: 100%;
+  font-family: "Press Start 2P", monospace;
+}
