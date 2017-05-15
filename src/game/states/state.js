@@ -30,7 +30,7 @@ module.exports = class State {
         this.onDeactivate();
     }
 
-    _update(msSinceLastFrame, currentTime) {
+    _update(msSinceLastFrame) {
         this.onUpdate(msSinceLastFrame);
     }
 

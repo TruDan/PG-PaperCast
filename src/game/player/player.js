@@ -41,14 +41,10 @@ const TINTS = [
 const SPEED = 0.25;
 
 module.exports = class Player extends Entity {
-    constructor(game, level, id, dsUser=false) {
+    constructor(session, game, level) {
         super(level, 32, 32);
-        this._id = id;
         this._game = game;
-        this._dsUser = dsUser;
-
-        if(this._dsUser)
-            this._record = global.ds.record.getRecord( 'player/' + this._id );
+        this._session = session;
 
         // public properties
         this.name = "";
@@ -56,8 +52,8 @@ module.exports = class Player extends Entity {
 
         this.isAlive = false;
         this._isMoving = false;
-        this._direction = Direction.NONE;
-        this._nextDirection = Direction.NONE;
+        this._direction = Direction.INVALID;
+        this._nextDirection = Direction.INVALID;
     }
 
     respawn(x, y) {
@@ -71,14 +67,15 @@ module.exports = class Player extends Entity {
     }
 
     move(direction) {
-        if(this._direction === direction) {
+        if(this._direction === direction || direction === this._nextDirection) {
             // Ignore, they're going that way anyway.
             return;
         }
 
         // Target direction is different to before, let's queue it.
-        this._nextDirection = direction;
         this._isMoving = true;
+        this._nextDirection = direction;
+        console.log("Move.", direction);
     }
 
     kill() {
@@ -95,9 +92,6 @@ module.exports = class Player extends Entity {
     }
 
     remove() {
-        if(this._record !== undefined)
-            this._record.delete();
-
         this.renderable = false;
         this._game._removeDebugInfo(this._debugPos);
         this.level.removePlayer(this);
@@ -116,14 +110,17 @@ module.exports = class Player extends Entity {
     _updateMove(dt) {
         if(!this.isAlive || !this._isMoving) return;
 
+
         // Only change their direction when fully in a grid cell
         let cellSize = this.level.cellSize;
-        if((this.x - this.level.gridOffset.x) % cellSize === 0 && (this.y - this.level.gridOffset.y) % cellSize === 0) {
+        if(this._direction === Direction.INVALID || ((this.x - this.level.gridOffset.x) % cellSize === 0 && (this.y - this.level.gridOffset.y) % cellSize === 0)) {
             this._direction = this._nextDirection;
         }
 
         if(this._direction === Direction.NONE || this._direction === Direction.INVALID)
             return;
+
+        //console.log("update move", this._isMoving, this._direction, this._nextDirection);
 
         let movePoint = this._getDirectionPoint(this._direction);
         let targetX = this.x + (movePoint.x * SPEED * dt);
@@ -231,20 +228,54 @@ module.exports = class Player extends Entity {
         this._updateGraphics();
         this._updateDebug();
 
-        // let's make sure the record is properly loaded
-        if(this._dsUser && this._record.isReady === false ) {
-            return;
-        }
-
         // data contains the user's input. We'll be using it a lot, so let's get it once
 
-        if(this._dsUser) {
-            var data = this._record.get();
+        if(this._session !== null) {
+            var data = this._session.getInput();
 
             this.name = data.name;
 
-            if (data.active) {
-                this.move(data.direction);
+            // input
+            var inputs = data.inputs;
+            if(inputs) {
+                if (inputs.direction) {
+                    var x = inputs.direction.x;
+                    var y = inputs.direction.y;
+
+                    var cap = 0.35;
+
+                    var direction = Direction.NONE;
+
+                    var absX = Math.abs(x);
+                    var absY = Math.abs(y);
+
+                    var r = Math.sqrt(absX*absX + absY*absY);
+
+                    if(!(r < cap && r < cap)) {
+                        if(absX > absY) {
+                            // X is stronger!
+                            if (x > cap) {
+                                direction = Direction.RIGHT;
+                            }
+                            else if (x < -cap) {
+                                direction = Direction.LEFT;
+                            }
+                        }
+                        else {
+                            if (y > cap) {
+                                direction = Direction.DOWN;
+                            }
+                            else if (y < -cap) {
+                                direction = Direction.UP;
+                            }
+                        }
+
+                    }
+
+                    this.move(direction);
+
+                    //console.log("Player Movement", this._session.getId(), this.name, x, y, direction, this._direction, this._nextDirection);
+                }
             }
         }
 

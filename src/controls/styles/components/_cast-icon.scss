@@ -53,3 +53,16 @@
     opacity: 0.5;
   }
 }
+
+@mixin cast-icon-variant($defaultColor, $activeColor, $warnColor, $defaultOpacity: 0.8) {
+  .cast-icon > svg {
+    fill: $defaultColor;
+    opacity: $defaultOpacity;
+  }
+  .cast-icon.cast-active > svg {
+    fill: $activeColor;
+  }
+  .cast-icon.cast-warn > svg {
+    fill: $warnColor;
+  }
+}

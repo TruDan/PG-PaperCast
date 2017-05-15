@@ -11,52 +11,68 @@
     <link rel="stylesheet" type="text/css" href="/build/controls.bundle.css" />
 </head>
 <body>
-<div class="valign-wrapper">
-<div class="container">
+<div class="container valign-wrapper">
+    <div class="row">
+        <div class="col s12">
+            <div class="connection-indicator">
+                <div class="connected light-green-text"><i class="material-icons">cloud</i> Connected to game servers</div>
+                <div class="warn orange-text"><i class="material-icons">cloud_queue</i> Connection error</div>
+                <div class="disconnected red-text"><i class="material-icons">cloud_off</i> No connection</div>
+            </div>
+        </div>
+    </div>
     <div class="row">
         <div class="col s12">
             <img src="/res/img/logo.png" class="logo center-align" />
         </div>
     </div>
-    <div class="row">
+    <div class="row grow">
         <div class="col s12" style="display:none;">
             <ul id="tabs-controls" class="tabs">
-                <li class="tab col s3"><a href="#overlay"></a></li>
-                <li class="tab col s3"><a class="active" href="#controls"></a></li>
+                <li class="tab col s3"><a class="active" href="#overlay"></a></li>
+                <li class="tab col s3"><a href="#controls"></a></li>
                 <li class="tab col s3"><a href="#game-over"></a></li>
             </ul>
         </div>
         <div class="col s12 m6 offset-m3" id="overlay">
-            <ul class="collapsible popout" data-collapsible="accordion">
-                <li>
-                    <div class="collapsible-header yellow darken-1 z-depth-2 waves-effect waves-light yellow-text text-darken-4">New Game</div>
-                    <div class="collapsible-body yellow darken-3">
-                        <form action="#" id="new-game">
-                            <div class="input-field">
-                                <input type="text" id="name">
-                                <label for="name">Username</label>
-                            </div>
-                            <button class="waves-effect waves-light btn yellow yellow-text text-darken-4" type="submit"><i class="material-icons cast-icon left"></i>Cast</button>
-                        </form>
+            <div class="row">
+                <div class="col s12">
+                    <div class="username-field">
+                        <div class="input-field">
+                            <input type="text" id="name">
+                            <label for="name">Username</label>
+                        </div>
                     </div>
-                </li>
-                <li>
-                    <div class="collapsible-header light-blue darken-4 z-depth-2 waves-effect waves-light light-blue-text text-accent-2">Join Game</div>
-                    <div class="collapsible-body light-blue darken-3">
-                        <form action="#" id="join-game">
-                            <div class="input-field">
-                                <input type="text" id="name">
-                                <label for="name">Username</label>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col s12">
+                    <ul class="collapsible popout" data-collapsible="accordion">
+                        <li>
+                            <div class="collapsible-header yellow darken-1 z-depth-2 waves-effect waves-light yellow-text text-darken-4 disabled">New Game</div>
+                            <div class="collapsible-body yellow darken-3">
+                                <form action="#" id="new-game">
+                                    <button class="waves-effect waves-light btn light-blue darken-2 light-blue-text text-darken-4 btn-block btn-retro" type="submit"><i class="material-icons cast-icon left"></i>Cast</button>
+                                </form>
                             </div>
-                            <div class="input-field">
-                                <input type="text" id="gameid">
-                                <label for="gameid">Game Code</label>
+                        </li>
+                        <li>
+                            <div class="collapsible-header light-blue darken-4 z-depth-2 waves-effect waves-light light-blue-text text-accent-2 disabled">Join Game</div>
+                            <div class="collapsible-body light-blue darken-3">
+                                <form action="#" id="join-game">
+                                    <div class="input-field">
+                                        <input type="text" id="gameid">
+                                        <label for="gameid">Game Code</label>
+                                    </div>
+                                    <input class="waves-effect waves-light btn yellow yellow-text text-darken-4 btn-block btn-retro" type="submit" value="Play" />
+                                </form>
                             </div>
-                            <input class="waves-effect waves-light btn yellow yellow-text text-darken-4" type="submit" value="Play" />
-                        </form>
-                    </div>
-                </li>
-            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
         </div>
         <div class="col s12 m6 offset-m3" id="controls">
             <div>
@@ -70,13 +86,10 @@
             </div>
         </div>
     </div>
+
     <div class="row">
-        <div class="col s12">
-            <div class="connection-indicator">
-                <div class="chip grey darken-3 connected light-green-text"><i class="material-icons">cloud</i> Connected to game servers</div>
-                <div class="chip grey darken-3 warn orange-text"><i class="material-icons">cloud_queue</i> Connected to game servers</div>
-                <div class="chip grey darken-3 disconnected red-text"><i class="material-icons">cloud_off</i> Connected to game servers</div>
-            </div>
+        <div class="col s12 center-align">
+            <a href="#" class="btn btn-flat blue-grey-text text-lighten-4 waves-effect waves-light btn-retro"><i class="material-icons left">games</i>Game Select</a>
         </div>
     </div>
     <div class="col s12 m6" id="game-over">
@@ -92,11 +105,11 @@
             <div class="mdl-cell mdl-cell--4-col"></div>
         </div>
     </div>
-</div>
+
     <script type="text/javascript" src="../node_modules/jquery/dist/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/js/materialize.min.js"></script>
     <script type="text/javascript" src="../node_modules/deepstream.io-client-js/dist/deepstream.min.js"></script>
     <script type="text/javascript" src="/build/controls.bundle.js"></script>
-<script type="text/javascript" src="//www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
+    <script type="text/javascript" src="//www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
 </body>
 </html>

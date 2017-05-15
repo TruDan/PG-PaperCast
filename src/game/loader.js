@@ -1,8 +1,8 @@
 /**
  * Created by truda on 09/05/2017.
  */
-const deepstream = require( 'deepstream.io-client-js' );
 const PIXI = require( 'pixi.js' );
+const Game = require('./game');
 
 /**
  * This class loads all required images into
@@ -52,6 +52,8 @@ class Loader{
 
         // Once all images are loaded, check if we're good to go
         this._assetLoader.once( 'complete', this._onImagesLoaded.bind( this ) );
+
+        this.game = new Game(window.document.body);
     }
 
     /**
@@ -66,7 +68,7 @@ class Loader{
     load( deepstreamUrl, callback ) {
         this._callback = callback;
         this._assetLoader.load();
-        global.ds = deepstream( deepstreamUrl ).login( null, this._onLoggedIn.bind( this ) );
+        this.game._init(deepstreamUrl, this._onLoggedIn.bind(this));
     }
 
     /**

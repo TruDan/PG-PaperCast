@@ -2,6 +2,9 @@
  * Created by truda on 09/05/2017.
  */
 const PIXI = require( 'pixi.js' );
+
+const BaseGame = require('../core/base/game');
+
 const Background = require( './ui/background' );
 const Player = require('./player/player');
 const Level = require('./level/level');
@@ -11,7 +14,7 @@ const EventEmitter = require( 'events' ).EventEmitter;
 const MainStage = require('./states/main');
 const GameStage = require('./states/game');
 
-module.exports = class Game extends EventEmitter{
+module.exports = class Game extends BaseGame {
     /**
      * Creates the game
      *
@@ -20,9 +23,13 @@ module.exports = class Game extends EventEmitter{
      * @constructor
      */
     constructor(element) {
-        super();
+        super("PaperCast");
         this._element = element;
 
+
+    }
+
+    onGameStart() {
         this.isDebug = false;
 
         this.players = [];
@@ -41,8 +48,6 @@ module.exports = class Game extends EventEmitter{
             _this.renderer.resize(window.innerWidth, window.innerHeight);
         };
 
-        this.id = this.makeid();
-
         this.layers = {
             bg: new PIXI.Container(),
             game: new PIXI.Container(),
@@ -52,7 +57,7 @@ module.exports = class Game extends EventEmitter{
 
         this.background = new Background(this);
         //this.background._viewInternal.width = this.renderer.width;
-       //this.background._viewInternal.height = this.renderer.height;
+        //this.background._viewInternal.height = this.renderer.height;
         this.layers.bg.addChild(this.background._viewInternal);
 
         this.layers.bg.alpha = 0.4;
@@ -73,11 +78,54 @@ module.exports = class Game extends EventEmitter{
         this.level = new Level(this);
         this.init();
 
-        global.ds.event.listen( 'status/' + this.id + '/.*', this._playerOnlineStatusChanged.bind( this ) );
+        //global.ds.event.listen( 'status/' + this.id + '/.*', this._playerOnlineStatusChanged.bind( this ) );
 
         this.start();
+    }
 
-        requestAnimationFrame(this._tick.bind( this ));
+    onGameEnd() {
+
+    }
+
+    onPlayerJoin(session) {
+        var p = new Player(session, this, this.level);
+        this.players.push(p);
+        this.level.addPlayer(p);
+        console.log("Added player", p);
+        this._verifyStage();
+    }
+
+    onPlayerQuit(session) {
+        var id = session.getId();
+
+        for( var i = 0; i < this.players.length; i++ ) {
+            var p = this.players[i];
+            if( p._id === id ) {
+                p.level.removePlayer(p);
+                this.players.splice( i, 1 );
+                console.log("Removed player", p);
+            }
+        }
+        this._verifyStage();
+    }
+
+    onGameTick(currentTime) {
+        var msSinceLastFrame = currentTime - this._lastFrameTime;
+        //this.emit( 'update', msSinceLastFrame/1000, currentTime );
+
+        if(this.activeStage !== null) {
+            this.activeStage._update(msSinceLastFrame, currentTime);
+        }
+
+        // store the time
+        this._lastFrameTime = currentTime;
+
+        this.background._tick(0);
+        this._updateDebug();
+
+        this.renderer.render( this.rootStage );
+
+        PIXI.keyboardManager.update();
     }
 
     setDebug(debug) {
@@ -96,17 +144,6 @@ module.exports = class Game extends EventEmitter{
         }
     }
 
-    makeid()
-    {
-        var text = "";
-        var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-
-        for( var i=0; i < 4; i++ )
-            text += possible.charAt(Math.floor(Math.random() * possible.length));
-
-        return text;
-    }
-
     init() {
         this.mainStage = new MainStage(this);
         this.gameStage = new GameStage(this);
@@ -118,27 +155,6 @@ module.exports = class Game extends EventEmitter{
     start() {
         this.activateStage(this.mainStage);
         //this.activateStage(this.gameStage);
-    }
-
-    /**
-     * Callback for listen. Is invoked whenever a player connects
-     * or disconnects
-     *
-     * @param   {String}  match        name of the event, e.g. status/mike
-     * @param   {Boolean} isSubscribed true if the player connected, false if disconnected
-     *
-     * @private
-     * @returns {void}
-     */
-    _playerOnlineStatusChanged( match, isSubscribed ) {
-        // Extract the player name from the status event
-        var id = match.replace( 'status/' + this.id + '/', '' );
-
-        if( isSubscribed ) {
-            this.addPlayer( id, true );
-        } else {
-            this.removePlayer( id );
-        }
     }
 
     activateStage(stage) {
@@ -165,8 +181,8 @@ module.exports = class Game extends EventEmitter{
         }
     }
 
-    addPlayer( id , dsUser =false) {
-        var p = new Player( this, this.level, id, dsUser );
+    addPlayer(id) {
+        var p = new Player( this, this.level, id);
         this.players.push( p );
         this.level.addPlayer(p);
         console.log("Added player", p);
@@ -184,27 +200,6 @@ module.exports = class Game extends EventEmitter{
             }
         }
         this._verifyStage();
-    }
-
-    _tick(currentTime) {
-
-        var msSinceLastFrame = currentTime - this._lastFrameTime;
-        this.emit( 'update', msSinceLastFrame/1000, currentTime );
-
-        if(this.activeStage !== null) {
-            this.activeStage._update(msSinceLastFrame, currentTime);
-        }
-
-        // store the time
-        this._lastFrameTime = currentTime;
-
-        this.background._tick(0);
-        this._updateDebug();
-
-        this.renderer.render( this.rootStage );
-
-        requestAnimationFrame( this._tick.bind( this ) );
-        PIXI.keyboardManager.update();
     }
 
     _initDebug() {

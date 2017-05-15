@@ -67,7 +67,7 @@ module.exports = class Main extends State {
 
 
 
-        this.roomCodeText = new PIXI.Text("Room Code\n" + this.game.id, {
+        this.roomCodeText = new PIXI.Text("Room Code\n" + this.game._id, {
             fontWeight: 'bold',
             fontSize: 100,
             fontFamily: 'Arial',

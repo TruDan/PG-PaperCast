@@ -69,7 +69,7 @@ module.exports = class Game extends State {
         this._parts.title.x = 50 + (this.game.renderer.width - 400)/2;
         this._parts.title.y = 75;
 
-        this._parts.gameId = new PIXI.Text(this.game.id, {
+        this._parts.gameId = new PIXI.Text(this.game._id, {
             fontFamily: "Press Start 2P",
             fill: 0x00BCD4,
             fontSize: 75,

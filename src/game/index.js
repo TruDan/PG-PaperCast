@@ -9,6 +9,6 @@ const loader = require( './loader' );
 loader.load(window.location.hostname + ':3002', () => {
     //document.body.aBackground = new Background(window.document.getElementById('background_container'));
     //document.body.aGame = new Game(window.document.getElementById('game_container'));
-    document.body._debug = new Debug();
+    //document.body._debug = new Debug();
 
 });

@@ -17,10 +17,25 @@ body{
 
 body > .valign-wrapper {
   height: 100%;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: stretch;
+
+  >.grow {
+    flex:1;
+  }
 }
 
 img.logo {
   display:block;
   margin: 50px auto;
   max-width: 100%;
+}
+
+h1,h2,h3,h4,h5,h6 {
+  font-family: "Press Start 2P";
+}
+
+.page-header {
+  padding: 18px 24px;
 }
